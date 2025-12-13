@@ -1,6 +1,6 @@
 # Marius Buliga's Work on Interaction Combinators and Chemlambda
 
-A comprehensive documentation and implementation of Marius Buliga's research on graph rewriting systems, interaction combinators, and chemlambda artificial chemistry.
+A comprehensive documentation and **working implementation** of Marius Buliga's research on graph rewriting systems, interaction combinators, and chemlambda artificial chemistry.
 
 ## Overview
 
@@ -11,6 +11,86 @@ This repository documents and implements the key contributions of Marius Buliga 
 3. **Directed Interaction Combinators** - Buliga's adaptation enabling artificial life properties
 4. **chemSKI** - A graph rewriting system for SKI combinator calculus
 5. **Quine Graphs** - Self-replicating graphs that exhibit metabolism, replication, and death
+
+## Features
+
+- ✅ **Working Python Implementation** - Actual code that runs
+- ✅ **Working JavaScript/Browser Implementation** - Runs in browser, matches original demos
+- ✅ **Graph Rewriting Engine** - Simulator for chemlambda reactions
+- ✅ **Example Simulations** - Runnable examples demonstrating key concepts
+- ✅ **Interactive Web Demo** - Browser-based visualization
+- ✅ **Comprehensive Documentation** - Detailed explanations of all systems
+
+## Quick Start
+
+### Installation
+
+```bash
+# Clone the repository
+git clone <repository-url>
+cd icombinators
+
+# Python 3.7+ required
+python3 --version
+
+# No external dependencies required (uses only standard library)
+```
+
+### Run Examples
+
+**Python:**
+```bash
+# Run BETA reduction example
+python3 examples/run_beta_example.py
+
+# Run quine simulation example
+python3 examples/run_quine_simulation.py
+
+# Run interactive simulator
+python3 examples/interactive_simulator.py
+
+# Run tests
+python3 test_basic.py
+```
+
+**JavaScript/Browser:**
+```bash
+# Open browser demo (no server needed!)
+open examples/browser_demo.html
+
+# Or with a local server:
+python3 -m http.server 8000
+# Then open http://localhost:8000/examples/browser_demo.html
+```
+
+## Implementation Structure
+
+```
+icombinators/
+├── src/
+│   ├── chemlambda/
+│   │   ├── graph.py          # Graph data structure (Python)
+│   │   ├── graph.js          # Graph data structure (JavaScript)
+│   │   ├── reactions.py      # Reaction implementations (Python)
+│   │   ├── reactions.js      # Reaction implementations (JavaScript)
+│   │   ├── simulator.py      # Simulation engine (Python)
+│   │   ├── simulator.js      # Simulation engine (JavaScript)
+│   │   ├── visualizer.py     # Visualization (Python)
+│   │   └── __init__.py
+│   ├── interaction_combinators/  # (Coming soon)
+│   └── chemski/              # (Coming soon)
+├── examples/
+│   ├── run_beta_example.py   # BETA reduction demo (Python)
+│   ├── beta_example.js       # BETA reduction demo (JavaScript)
+│   ├── browser_demo.html      # Interactive browser demo
+│   ├── chemlambda-browser.js # Browser bundle
+│   ├── run_quine_simulation.py  # Quine simulation
+│   └── interactive_simulator.py # Interactive Python simulator
+├── docs/                      # Documentation
+├── reactions/                 # Reaction documentation
+├── test_basic.py             # Python tests
+└── README.md
+```
 
 ## Table of Contents
 
@@ -24,12 +104,12 @@ This repository documents and implements the key contributions of Marius Buliga 
 
 ## Key Reactions
 
-### Chemlambda Reactions
-- [BETA Move](reactions/chemlambda/beta.md) - Core lambda calculus beta reduction
+### Chemlambda Reactions (Implemented)
+- [BETA Move](reactions/chemlambda/beta.md) - Core lambda calculus beta reduction ✅
 - [FAN-IN Move](reactions/chemlambda/fan-in.md) - Fan-in operations
 - [DIST Moves](reactions/chemlambda/dist.md) - Distribution operations for parallel reduction
-- [PRUNING Moves](reactions/chemlambda/pruning.md) - Garbage collection and termination
-- [COMB Move](reactions/chemlambda/comb.md) - Arrow elimination
+- [PRUNING Moves](reactions/chemlambda/pruning.md) - Garbage collection and termination ✅
+- [COMB Move](reactions/chemlambda/comb.md) - Arrow elimination ✅
 
 ### Interaction Combinators Reactions
 - [Commutation Rules](reactions/interaction_combinators/commutation.md) - Interaction between different symbols
@@ -43,6 +123,49 @@ This repository documents and implements the key contributions of Marius Buliga 
 - [Ackermann Function](examples/ackermann.md) - Computing Ackermann(2,2) with chemlambda
 - [Ouroboros Quine](examples/ouroboros.md) - Self-replicating graph example
 - [9-Quine](examples/9-quine.md) - Another quine graph example
+
+## Usage
+
+### Basic Usage
+
+```python
+from chemlambda import Graph, NodeType, Simulator, create_simple_application
+
+# Create a graph
+graph = create_simple_application()
+
+# Create simulator
+simulator = Simulator(graph)
+
+# Run simulation
+steps = simulator.run(max_steps=100)
+
+# Get statistics
+stats = simulator.get_stats()
+print(f"Steps: {stats['total_steps']}")
+print(f"Reactions: {stats['reaction_counts']}")
+```
+
+### Creating Custom Graphs
+
+```python
+from chemlambda import Graph, NodeType
+
+graph = Graph()
+
+# Add nodes
+l_id = graph.add_node(NodeType.L)
+a_id = graph.add_node(NodeType.A)
+
+# Connect nodes
+l_node = graph.nodes[l_id]
+a_node = graph.nodes[a_id]
+graph.connect(l_node.ports["right"], a_node.ports["left"])
+
+# Run simulation
+simulator = Simulator(graph)
+simulator.run()
+```
 
 ## Key Papers
 
@@ -77,11 +200,17 @@ A key insight of Buliga's work is the focus on **structure-to-structure** comput
 - Emergence of artificial life properties
 - Potential implementation in real chemistry
 
-## License
-
-This documentation is provided for educational and research purposes. Please refer to the original papers and repositories for licensing information.
-
 ## Contributing
 
-This is a documentation repository. For implementations and experiments, please refer to the original repositories listed in the Resources section.
+Contributions welcome! Areas for contribution:
 
+- More reaction implementations (DIST moves, FAN-IN, etc.)
+- Interaction combinators implementation
+- chemSKI implementation
+- Visualization tools
+- More examples
+- Performance optimizations
+
+## License
+
+This documentation and implementation is provided for educational and research purposes. Please refer to the original papers and repositories for licensing information.

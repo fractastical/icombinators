@@ -1,0 +1,24 @@
+{
+  "name": "icombinators",
+  "version": "1.0.0",
+  "description": "Marius Buliga's Interaction Combinators and Chemlambda - Working Implementation",
+  "main": "src/chemlambda/graph.js",
+  "type": "module",
+  "scripts": {
+    "test": "node examples/beta_example.js",
+    "example": "node examples/beta_example.js"
+  },
+  "keywords": [
+    "chemlambda",
+    "interaction-combinators",
+    "graph-rewriting",
+    "lambda-calculus",
+    "molecular-computing"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
+

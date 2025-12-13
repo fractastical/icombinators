@@ -1,0 +1,15 @@
+# Requirements for icombinators project
+# Python 3.7+
+
+# Core dependencies
+# (Currently using only standard library)
+
+# Optional: For better visualization
+# matplotlib>=3.5.0
+# networkx>=2.6.0
+# graphviz>=0.19
+
+# Optional: For web visualization
+# flask>=2.0.0
+# flask-socketio>=5.0.0
+
