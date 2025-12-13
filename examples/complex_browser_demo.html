@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chemlambda Complex Examples - Loops, Cycles, Reactions</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #1e1e1e;
+            color: #d4d4d4;
+        }
+        h1 { color: #4ec9b0; }
+        .example-selector {
+            margin: 20px 0;
+            padding: 15px;
+            background: #252526;
+            border-radius: 5px;
+        }
+        select {
+            background: #3e3e42;
+            color: #d4d4d4;
+            border: 1px solid #0e639c;
+            padding: 8px;
+            font-size: 14px;
+            border-radius: 3px;
+            width: 100%;
+            max-width: 400px;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .panel {
+            background: #252526;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #3e3e42;
+        }
+        button {
+            background: #0e639c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        button:hover { background: #1177bb; }
+        button:disabled {
+            background: #3e3e42;
+            cursor: not-allowed;
+        }
+        .graph-display {
+            background: #1e1e1e;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            max-height: 500px;
+            overflow-y: auto;
+            font-size: 12px;
+        }
+        .stats {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #3e3e42;
+        }
+        .reaction-log {
+            max-height: 400px;
+            overflow-y: auto;
+            font-size: 11px;
+        }
+        .log-entry {
+            margin: 3px 0;
+            padding: 3px;
+            background: #1e1e1e;
+            border-left: 3px solid #4ec9b0;
+            padding-left: 10px;
+        }
+        .description {
+            background: #2d2d30;
+            padding: 10px;
+            border-radius: 3px;
+            margin-bottom: 15px;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Chemlambda Complex Examples</h1>
+    <p>Loops, cycles, chemical reaction networks, and quine-like structures</p>
+    
+    <div class="example-selector">
+        <label for="exampleSelect"><strong>Select Example:</strong></label>
+        <select id="exampleSelect" onchange="loadExample()">
+            <option value="loop">Loop Example (Arrow cycle)</option>
+            <option value="fixed_point">Fixed Point Combinator (Y)</option>
+            <option value="quine">Quine-like Structure</option>
+            <option value="reaction_network">Chemical Reaction Network</option>
+            <option value="ouroboros">Ouroboros (Snake Eating Tail)</option>
+            <option value="metabolism">Metabolism Example</option>
+        </select>
+    </div>
+    
+    <div class="container">
+        <div class="panel">
+            <h2>Graph Structure (.mol format)</h2>
+            <div id="description" class="description"></div>
+            <div class="graph-display" id="graphDisplay">Loading...</div>
+            
+            <div style="margin: 15px 0;">
+                <button id="stepBtn" onclick="step()">Step</button>
+                <button id="runBtn" onclick="run()">Run 20 Steps</button>
+                <button id="resetBtn" onclick="reset()">Reset</button>
+            </div>
+            
+            <div class="stats">
+                <h3>Statistics</h3>
+                <div>Steps: <span id="stepCount">0</span></div>
+                <div>Nodes: <span id="nodeCount">0</span></div>
+                <div>Edges: <span id="edgeCount">0</span></div>
+                <div>Reactions: <span id="reactionCounts">-</span></div>
+            </div>
+        </div>
+        
+        <div class="panel">
+            <h2>Reaction Log</h2>
+            <div class="reaction-log" id="reactionLog">
+                <div class="log-entry">Select an example to start</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="chemlambda-browser.js"></script>
+    <script>
+        // Example descriptions
+        const descriptions = {
+            loop: "A simple cycle of Arrow nodes connected in a loop. Demonstrates circular structures in chemlambda.",
+            fixed_point: "Y combinator structure with self-application loops. Enables recursion and fixed points.",
+            quine: "Multiple lambda-application pairs that can potentially replicate through parallel reactions.",
+            reaction_network: "Multiple molecules connected in a reaction network with cycles. Shows chemical-like behavior.",
+            ouroboros: "A chain of nodes connected in a loop (snake eating its tail). Self-referential structure.",
+            metabolism: "An organism-like structure that can process food molecules. Demonstrates metabolism."
+        };
+        
+        // Example creators (simplified versions)
+        const exampleCreators = {
+            loop: function() {
+                const graph = new Graph();
+                const arrow1Id = graph.addNode(NodeType.ARROW);
+                const arrow2Id = graph.addNode(NodeType.ARROW);
+                const arrow3Id = graph.addNode(NodeType.ARROW);
+                const arrow1 = graph.nodes[arrow1Id];
+                const arrow2 = graph.nodes[arrow2Id];
+                const arrow3 = graph.nodes[arrow3Id];
+                graph.connect(arrow1.ports.middle_out, arrow2.ports.middle);
+                graph.connect(arrow2.ports.middle_out, arrow3.ports.middle);
+                graph.connect(arrow3.ports.middle_out, arrow1.ports.middle);
+                return graph;
+            },
+            fixed_point: function() {
+                const graph = new Graph();
+                const l1Id = graph.addNode(NodeType.L);
+                const l2Id = graph.addNode(NodeType.L);
+                const a1Id = graph.addNode(NodeType.A);
+                const a2Id = graph.addNode(NodeType.A);
+                const l1 = graph.nodes[l1Id];
+                const l2 = graph.nodes[l2Id];
+                const a1 = graph.nodes[a1Id];
+                const a2 = graph.nodes[a2Id];
+                graph.connect(l1.ports.right, a1.ports.left);
+                graph.connect(l2.ports.right, a2.ports.left);
+                graph.connect(a2.ports.middle, a2.ports.right); // Self-application
+                graph.connect(l2.ports.left, a1.ports.middle);
+                return graph;
+            },
+            quine: function() {
+                const graph = new Graph();
+                for (let i = 0; i < 3; i++) {
+                    const lId = graph.addNode(NodeType.L);
+                    const aId = graph.addNode(NodeType.A);
+                    const lNode = graph.nodes[lId];
+                    const aNode = graph.nodes[aId];
+                    graph.connect(lNode.ports.right, aNode.ports.left);
+                    graph.connect(lNode.ports.left, aNode.ports.middle);
+                }
+                return graph;
+            },
+            reaction_network: function() {
+                const graph = new Graph();
+                const molecules = [];
+                for (let i = 0; i < 3; i++) {
+                    const lId = graph.addNode(NodeType.L);
+                    const aId = graph.addNode(NodeType.A);
+                    molecules.push([lId, aId]);
+                    const lNode = graph.nodes[lId];
+                    const aNode = graph.nodes[aId];
+                    graph.connect(lNode.ports.right, aNode.ports.left);
+                    graph.connect(lNode.ports.left, aNode.ports.middle);
+                }
+                const mol0L = graph.nodes[molecules[0][0]];
+                const mol1A = graph.nodes[molecules[1][1]];
+                graph.connect(mol0L.ports.middle, mol1A.ports.right);
+                const mol1L = graph.nodes[molecules[1][0]];
+                const mol2A = graph.nodes[molecules[2][1]];
+                graph.connect(mol1L.ports.middle, mol2A.ports.right);
+                const mol2L = graph.nodes[molecules[2][0]];
+                const mol0A = graph.nodes[molecules[0][1]];
+                graph.connect(mol2L.ports.middle, mol0A.ports.right);
+                return graph;
+            },
+            ouroboros: function() {
+                const graph = new Graph();
+                const nodes = [];
+                for (let i = 0; i < 5; i++) {
+                    const nodeId = (i % 2 === 0) 
+                        ? graph.addNode(NodeType.L)
+                        : graph.addNode(NodeType.A);
+                    nodes.push(nodeId);
+                }
+                for (let i = 0; i < nodes.length - 1; i++) {
+                    const node1 = graph.nodes[nodes[i]];
+                    const node2 = graph.nodes[nodes[i + 1]];
+                    if (node1.nodeType === NodeType.L) {
+                        graph.connect(node1.ports.right, node2.ports.left);
+                    } else {
+                        graph.connect(node1.ports.middle, node2.ports.left);
+                    }
+                }
+                const lastNode = graph.nodes[nodes[nodes.length - 1]];
+                const firstNode = graph.nodes[nodes[0]];
+                if (lastNode.nodeType === NodeType.A) {
+                    graph.connect(lastNode.ports.middle, firstNode.ports.middle);
+                } else {
+                    graph.connect(lastNode.ports.right, firstNode.ports.middle);
+                }
+                return graph;
+            },
+            metabolism: function() {
+                const graph = new Graph();
+                const organismLId = graph.addNode(NodeType.L);
+                const organismL = graph.nodes[organismLId];
+                const organismAId = graph.addNode(NodeType.A);
+                const organismA = graph.nodes[organismAId];
+                graph.connect(organismL.ports.right, organismA.ports.left);
+                graph.connect(organismL.ports.left, organismA.ports.middle);
+                const foodNodes = [];
+                for (let i = 0; i < 3; i++) {
+                    const foodId = graph.addNode(NodeType.A);
+                    foodNodes.push(foodId);
+                    const foodNode = graph.nodes[foodId];
+                    graph.connect(foodNode.ports.middle, organismA.ports.right);
+                }
+                const foId = graph.addNode(NodeType.FO);
+                const fo = graph.nodes[foId];
+                graph.connect(fo.ports.middle, organismL.ports.middle);
+                graph.connect(fo.ports.left, graph.nodes[foodNodes[0]].ports.left);
+                graph.connect(fo.ports.right, graph.nodes[foodNodes[1]].ports.left);
+                return graph;
+            }
+        };
+        
+        let simulator = null;
+        let initialGraph = null;
+        let currentExample = null;
+        
+        function loadExample() {
+            const exampleName = document.getElementById('exampleSelect').value;
+            currentExample = exampleName;
+            
+            initialGraph = exampleCreators[exampleName]();
+            simulator = new Simulator(initialGraph);
+            
+            document.getElementById('description').textContent = descriptions[exampleName];
+            document.getElementById('reactionLog').innerHTML = '<div class="log-entry">Example loaded - Ready to simulate</div>';
+            
+            updateDisplay();
+        }
+        
+        function updateDisplay() {
+            const graph = simulator.graph;
+            document.getElementById('graphDisplay').textContent = graph.toMolFormat();
+            
+            const stats = simulator.getStats();
+            document.getElementById('stepCount').textContent = stats.totalSteps;
+            document.getElementById('nodeCount').textContent = stats.finalNodes;
+            document.getElementById('edgeCount').textContent = Math.floor(stats.finalEdges);
+            
+            const counts = Object.entries(stats.reactionCounts)
+                .map(([name, count]) => `${name}: ${count}`)
+                .join(', ');
+            document.getElementById('reactionCounts').textContent = counts || 'None';
+            
+            const testSim = new Simulator(graph.clone());
+            document.getElementById('stepBtn').disabled = !testSim.step(false);
+        }
+        
+        function addLogEntry(message) {
+            const log = document.getElementById('reactionLog');
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.textContent = message;
+            log.insertBefore(entry, log.firstChild);
+        }
+        
+        window.step = function() {
+            const applied = simulator.step(false);
+            if (applied) {
+                const [step, reactionName] = simulator.reactionHistory[simulator.reactionHistory.length - 1];
+                addLogEntry(`Step ${step}: Applied ${reactionName}`);
+                updateDisplay();
+            } else {
+                addLogEntry('No more reactions can be applied');
+            }
+        };
+        
+        window.run = function() {
+            let steps = 0;
+            const maxSteps = 20;
+            while (steps < maxSteps) {
+                const applied = simulator.step(false);
+                if (!applied) break;
+                steps++;
+                const [step, reactionName] = simulator.reactionHistory[simulator.reactionHistory.length - 1];
+                if (steps <= 5 || steps % 5 === 0) {
+                    addLogEntry(`Step ${step}: Applied ${reactionName}`);
+                }
+            }
+            addLogEntry(`Ran ${steps} steps`);
+            updateDisplay();
+        };
+        
+        window.reset = function() {
+            if (currentExample) {
+                initialGraph = exampleCreators[currentExample]();
+                simulator = new Simulator(initialGraph);
+                document.getElementById('reactionLog').innerHTML = '<div class="log-entry">Reset - Ready to simulate</div>';
+                updateDisplay();
+            }
+        };
+        
+        // Initialize with first example
+        loadExample();
+    </script>
+</body>
+</html>
+

@@ -17,8 +17,9 @@ This repository documents and implements the key contributions of Marius Buliga 
 - ✅ **Working Python Implementation** - Actual code that runs
 - ✅ **Working JavaScript/Browser Implementation** - Runs in browser, matches original demos
 - ✅ **Graph Rewriting Engine** - Simulator for chemlambda reactions
+- ✅ **Complex Examples** - Loops, cycles, chemical reaction networks, quine structures
 - ✅ **Example Simulations** - Runnable examples demonstrating key concepts
-- ✅ **Interactive Web Demo** - Browser-based visualization
+- ✅ **Interactive Web Demo** - Browser-based visualization with multiple examples
 - ✅ **Comprehensive Documentation** - Detailed explanations of all systems
 
 ## Quick Start
@@ -43,6 +44,9 @@ python3 --version
 # Run BETA reduction example
 python3 examples/run_beta_example.py
 
+# Run complex examples (loops, cycles, chemical reactions)
+python3 examples/complex_examples.py
+
 # Run quine simulation example
 python3 examples/run_quine_simulation.py
 
@@ -58,6 +62,9 @@ python3 test_basic.py
 # Open browser demo (no server needed!)
 open examples/browser_demo.html
 
+# Open complex examples demo (loops, cycles, reactions)
+open examples/complex_browser_demo.html
+
 # Or with a local server:
 python3 -m http.server 8000
 # Then open http://localhost:8000/examples/browser_demo.html
@@ -72,17 +79,21 @@ icombinators/
 │   │   ├── graph.py          # Graph data structure (Python)
 │   │   ├── graph.js          # Graph data structure (JavaScript)
 │   │   ├── reactions.py      # Reaction implementations (Python)
-│   │   ├── reactions.js      # Reaction implementations (JavaScript)
+│   │   ├── reactions.js       # Reaction implementations (JavaScript)
 │   │   ├── simulator.py      # Simulation engine (Python)
 │   │   ├── simulator.js      # Simulation engine (JavaScript)
 │   │   ├── visualizer.py     # Visualization (Python)
+│   │   ├── examples.py       # Complex example graphs (Python)
+│   │   ├── examples.js       # Complex example graphs (JavaScript)
 │   │   └── __init__.py
 │   ├── interaction_combinators/  # (Coming soon)
 │   └── chemski/              # (Coming soon)
 ├── examples/
 │   ├── run_beta_example.py   # BETA reduction demo (Python)
+│   ├── complex_examples.py   # Complex examples (loops, cycles, etc.)
 │   ├── beta_example.js       # BETA reduction demo (JavaScript)
-│   ├── browser_demo.html      # Interactive browser demo
+│   ├── browser_demo.html     # Interactive browser demo
+│   ├── complex_browser_demo.html  # Complex examples browser demo
 │   ├── chemlambda-browser.js # Browser bundle
 │   ├── run_quine_simulation.py  # Quine simulation
 │   └── interactive_simulator.py # Interactive Python simulator
@@ -91,6 +102,19 @@ icombinators/
 ├── test_basic.py             # Python tests
 └── README.md
 ```
+
+## Complex Examples
+
+The implementation includes examples with **loops, cycles, and chemical reaction networks**:
+
+- **Loop Example** - Arrow nodes connected in cycles
+- **Fixed Point Combinator (Y)** - Self-application loops for recursion
+- **Quine-like Structure** - Multiple reaction sites for potential replication
+- **Chemical Reaction Network** - Multiple molecules connected in reaction cycles
+- **Ouroboros** - Chain of nodes forming a loop (snake eating its tail)
+- **Metabolism Example** - Organism-like structure processing food molecules
+
+These match the complexity and style of Marius Buliga's original demos!
 
 ## Table of Contents
 
@@ -129,10 +153,14 @@ icombinators/
 ### Basic Usage
 
 ```python
-from chemlambda import Graph, NodeType, Simulator, create_simple_application
+from chemlambda import Graph, NodeType, Simulator
+from chemlambda.examples import create_loop_example, create_chemical_reaction_network
 
-# Create a graph
-graph = create_simple_application()
+# Create a graph with loops
+graph = create_loop_example()
+
+# Or create a chemical reaction network
+graph = create_chemical_reaction_network()
 
 # Create simulator
 simulator = Simulator(graph)
@@ -146,21 +174,26 @@ print(f"Steps: {stats['total_steps']}")
 print(f"Reactions: {stats['reaction_counts']}")
 ```
 
-### Creating Custom Graphs
+### Creating Custom Graphs with Loops
 
 ```python
 from chemlambda import Graph, NodeType
 
 graph = Graph()
 
-# Add nodes
-l_id = graph.add_node(NodeType.L)
-a_id = graph.add_node(NodeType.A)
+# Create nodes
+arrow1_id = graph.add_node(NodeType.ARROW)
+arrow2_id = graph.add_node(NodeType.ARROW)
+arrow3_id = graph.add_node(NodeType.ARROW)
 
-# Connect nodes
-l_node = graph.nodes[l_id]
-a_node = graph.nodes[a_id]
-graph.connect(l_node.ports["right"], a_node.ports["left"])
+# Connect in a cycle
+arrow1 = graph.nodes[arrow1_id]
+arrow2 = graph.nodes[arrow2_id]
+arrow3 = graph.nodes[arrow3_id]
+
+graph.connect(arrow1.ports["middle_out"], arrow2.ports["middle"])
+graph.connect(arrow2.ports["middle_out"], arrow3.ports["middle"])
+graph.connect(arrow3.ports["middle_out"], arrow1.ports["middle"])  # Loop!
 
 # Run simulation
 simulator = Simulator(graph)
