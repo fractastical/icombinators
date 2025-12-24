@@ -1,0 +1,7 @@
+<svg width="600" height="400" xmlns="http://www.w3.org/2000/svg">
+<rect width="600" height="400" fill="#000000"/>
+<circle cx="433.3" cy="200.0" r="15" fill="#c586c0" stroke="#ffffff" stroke-width="2"/>
+<text x="433.3" y="205.0" fill="#ffffff" font-size="10" font-family="monospace" text-anchor="middle">Arrow</text>
+<circle cx="166.7" cy="200.0" r="15" fill="#c586c0" stroke="#ffffff" stroke-width="2"/>
+<text x="166.7" y="205.0" fill="#ffffff" font-size="10" font-family="monospace" text-anchor="middle">Arrow</text>
+</svg>

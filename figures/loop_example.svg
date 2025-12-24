@@ -1,0 +1,12 @@
+<svg width="600" height="400" xmlns="http://www.w3.org/2000/svg">
+<rect width="600" height="400" fill="#000000"/>
+<line x1="433.3" y1="200.0" x2="233.3" y2="315.5" stroke="#666666" stroke-width="2"/>
+<line x1="233.3" y1="315.5" x2="233.3" y2="84.5" stroke="#666666" stroke-width="2"/>
+<line x1="233.3" y1="84.5" x2="433.3" y2="200.0" stroke="#666666" stroke-width="2"/>
+<circle cx="433.3" cy="200.0" r="15" fill="#c586c0" stroke="#ffffff" stroke-width="2"/>
+<text x="433.3" y="205.0" fill="#ffffff" font-size="10" font-family="monospace" text-anchor="middle">Arrow</text>
+<circle cx="233.3" cy="315.5" r="15" fill="#c586c0" stroke="#ffffff" stroke-width="2"/>
+<text x="233.3" y="320.5" fill="#ffffff" font-size="10" font-family="monospace" text-anchor="middle">Arrow</text>
+<circle cx="233.3" cy="84.5" r="15" fill="#c586c0" stroke="#ffffff" stroke-width="2"/>
+<text x="233.3" y="89.5" fill="#ffffff" font-size="10" font-family="monospace" text-anchor="middle">Arrow</text>
+</svg>

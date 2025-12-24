@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chemlambda Visual Demo - Like Buliga's Original</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Courier New', monospace;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        h1 { color: #4ec9b0; margin-bottom: 10px; }
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        select {
+            background: #3e3e42;
+            color: #d4d4d4;
+            border: 2px solid #ce9178;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 14px;
+            min-width: 300px;
+        }
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .slider-label {
+            color: #569cd6;
+            font-weight: bold;
+        }
+        input[type="range"] {
+            width: 200px;
+            height: 6px;
+            background: #3e3e42;
+            outline: none;
+            border-radius: 3px;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            background: #ce9178;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        .slider-endpoints {
+            display: flex;
+            justify-content: space-between;
+            width: 200px;
+            font-size: 12px;
+            color: #569cd6;
+        }
+        button {
+            background: #0e639c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover { background: #1177bb; }
+        button:disabled {
+            background: #3e3e42;
+            cursor: not-allowed;
+        }
+        .graph-container {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        #graphCanvas {
+            background: #1e1e1e;
+            border: 2px solid #3e3e42;
+            border-radius: 5px;
+        }
+        .info-panel {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 20px auto;
+        }
+        .panel {
+            background: #252526;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #3e3e42;
+        }
+        .mol-display {
+            background: #1e1e1e;
+            padding: 10px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .stats {
+            font-size: 13px;
+        }
+        .stat-item {
+            margin: 5px 0;
+            padding: 5px;
+            background: #1e1e1e;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🧪 Chemlambda Visual Demo</h1>
+        <p>Interactive graph visualization - Like Buliga's original demos</p>
+    </div>
+    
+    <div class="controls">
+        <select id="exampleSelect" onchange="loadExample()">
+            <option value="simple">Simple Application (λx.x) y</option>
+            <option value="loop">Loop Example (Arrow Cycle)</option>
+            <option value="fixed_point">Fixed Point Combinator (Y)</option>
+            <option value="quine">Quine-like Structure</option>
+            <option value="reaction_network">Chemical Reaction Network</option>
+            <option value="ouroboros">Ouroboros (Snake Eating Tail)</option>
+            <option value="metabolism">Metabolism Example</option>
+        </select>
+        
+        <div class="slider-container">
+            <span class="slider-label">Rewrites:</span>
+            <div>
+                <input type="range" id="rewriteSlider" min="0" max="100" value="50" 
+                       oninput="updateRewriteWeight(this.value)">
+                <div class="slider-endpoints">
+                    <span>SLIM</span>
+                    <span>GROW</span>
+                </div>
+            </div>
+        </div>
+        
+        <button onclick="step()">Step</button>
+        <button onclick="run()">Run</button>
+        <button onclick="reset()">Reset</button>
+    </div>
+    
+    <div class="graph-container">
+        <canvas id="graphCanvas" width="800" height="600"></canvas>
+    </div>
+    
+    <div class="info-panel">
+        <div class="panel">
+            <h3>.mol Format</h3>
+            <div class="mol-display" id="molDisplay"></div>
+        </div>
+        <div class="panel">
+            <h3>Statistics</h3>
+            <div class="stats">
+                <div class="stat-item">Steps: <span id="stepCount">0</span></div>
+                <div class="stat-item">Nodes: <span id="nodeCount">0</span></div>
+                <div class="stat-item">Edges: <span id="edgeCount">0</span></div>
+                <div class="stat-item">Reactions: <span id="reactionCounts">-</span></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="chemlambda-browser.js"></script>
+    <script>
+        const canvas = document.getElementById('graphCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        let simulator = null;
+        let initialGraph = null;
+        let currentExample = null;
+        let nodePositions = {};
+        
+        // Node type colors (matching Buliga's style)
+        const nodeColors = {
+            'L': '#4ec9b0',    // Cyan for Lambda
+            'A': '#ce9178',    // Orange for Application
+            'FI': '#569cd6',   // Blue for Fan-In
+            'FO': '#dcdcaa',   // Yellow for Fan-Out
+            'FOE': '#d7ba7d',  // Light yellow
+            'T': '#808080',    // Gray
+            'Arrow': '#c586c0', // Purple
+            'FRIN': '#9cdcfe',
+            'FROUT': '#9cdcfe'
+        };
+        
+        function layoutGraph(graph) {
+            const nodes = Object.keys(graph.nodes).map(id => parseInt(id));
+            const n = nodes.length;
+            nodePositions = {};
+            
+            if (n === 0) return;
+            
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = n === 1 ? 0 : Math.min(canvas.width, canvas.height) / 3;
+            
+            nodes.forEach((nodeId, i) => {
+                const angle = (2 * Math.PI * i) / n;
+                const x = centerX + radius * Math.cos(angle);
+                const y = centerY + radius * Math.sin(angle);
+                nodePositions[nodeId] = { x, y };
+            });
+        }
+        
+        function drawGraph(graph) {
+            // Clear canvas
+            ctx.fillStyle = '#1e1e1e';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw edges
+            const drawnEdges = new Set();
+            graph.edges.forEach((port2, port1) => {
+                const id1 = port1.nodeId;
+                const id2 = port2.nodeId;
+                
+                if (id1 in nodePositions && id2 in nodePositions) {
+                    const edgeKey = id1 < id2 ? `${id1}-${id2}` : `${id2}-${id1}`;
+                    if (!drawnEdges.has(edgeKey)) {
+                        drawnEdges.add(edgeKey);
+                        
+                        const pos1 = nodePositions[id1];
+                        const pos2 = nodePositions[id2];
+                        
+                        ctx.strokeStyle = '#666';
+                        ctx.lineWidth = 2;
+                        ctx.beginPath();
+                        ctx.moveTo(pos1.x, pos1.y);
+                        ctx.lineTo(pos2.x, pos2.y);
+                        ctx.stroke();
+                        
+                        // Draw arrowhead
+                        const angle = Math.atan2(pos2.y - pos1.y, pos2.x - pos1.x);
+                        const arrowLength = 10;
+                        const arrowAngle = Math.PI / 6;
+                        ctx.beginPath();
+                        ctx.moveTo(pos2.x, pos2.y);
+                        ctx.lineTo(
+                            pos2.x - arrowLength * Math.cos(angle - arrowAngle),
+                            pos2.y - arrowLength * Math.sin(angle - arrowAngle)
+                        );
+                        ctx.moveTo(pos2.x, pos2.y);
+                        ctx.lineTo(
+                            pos2.x - arrowLength * Math.cos(angle + arrowAngle),
+                            pos2.y - arrowLength * Math.sin(angle + arrowAngle)
+                        );
+                        ctx.stroke();
+                    }
+                }
+            });
+            
+            // Draw nodes
+            Object.entries(nodePositions).forEach(([nodeId, pos]) => {
+                const node = graph.nodes[parseInt(nodeId)];
+                if (!node) return;
+                
+                const nodeType = node.nodeType;
+                const color = nodeColors[nodeType] || '#ffffff';
+                const label = nodeType;
+                
+                // Draw node circle
+                ctx.fillStyle = color;
+                ctx.beginPath();
+                ctx.arc(pos.x, pos.y, 15, 0, 2 * Math.PI);
+                ctx.fill();
+                
+                // Draw border
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                
+                // Draw label
+                ctx.fillStyle = '#fff';
+                ctx.font = '10px monospace';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(label, pos.x, pos.y);
+            });
+        }
+        
+        function updateDisplay() {
+            const graph = simulator.graph;
+            layoutGraph(graph);
+            drawGraph(graph);
+            
+            document.getElementById('molDisplay').textContent = graph.toMolFormat();
+            
+            const stats = simulator.getStats();
+            document.getElementById('stepCount').textContent = stats.totalSteps;
+            document.getElementById('nodeCount').textContent = stats.finalNodes;
+            document.getElementById('edgeCount').textContent = Math.floor(stats.finalEdges);
+            
+            const counts = Object.entries(stats.reactionCounts)
+                .map(([name, count]) => `${name}: ${count}`)
+                .join(', ');
+            document.getElementById('reactionCounts').textContent = counts || 'None';
+            
+            const testSim = new Simulator(graph.clone());
+            document.getElementById('stepBtn').disabled = !testSim.step(false);
+        }
+        
+        const exampleCreators = {
+            simple: () => createSimpleApplication(),
+            loop: () => {
+                const graph = new Graph();
+                const arrow1Id = graph.addNode(NodeType.ARROW);
+                const arrow2Id = graph.addNode(NodeType.ARROW);
+                const arrow3Id = graph.addNode(NodeType.ARROW);
+                const arrow1 = graph.nodes[arrow1Id];
+                const arrow2 = graph.nodes[arrow2Id];
+                const arrow3 = graph.nodes[arrow3Id];
+                graph.connect(arrow1.ports.middle_out, arrow2.ports.middle);
+                graph.connect(arrow2.ports.middle_out, arrow3.ports.middle);
+                graph.connect(arrow3.ports.middle_out, arrow1.ports.middle);
+                return graph;
+            },
+            fixed_point: () => {
+                const graph = new Graph();
+                const l1Id = graph.addNode(NodeType.L);
+                const l2Id = graph.addNode(NodeType.L);
+                const a1Id = graph.addNode(NodeType.A);
+                const a2Id = graph.addNode(NodeType.A);
+                const l1 = graph.nodes[l1Id];
+                const l2 = graph.nodes[l2Id];
+                const a1 = graph.nodes[a1Id];
+                const a2 = graph.nodes[a2Id];
+                graph.connect(l1.ports.right, a1.ports.left);
+                graph.connect(l2.ports.right, a2.ports.left);
+                graph.connect(a2.ports.middle, a2.ports.right);
+                graph.connect(l2.ports.left, a1.ports.middle);
+                return graph;
+            },
+            quine: () => {
+                const graph = new Graph();
+                for (let i = 0; i < 3; i++) {
+                    const lId = graph.addNode(NodeType.L);
+                    const aId = graph.addNode(NodeType.A);
+                    const lNode = graph.nodes[lId];
+                    const aNode = graph.nodes[aId];
+                    graph.connect(lNode.ports.right, aNode.ports.left);
+                    graph.connect(lNode.ports.left, aNode.ports.middle);
+                }
+                return graph;
+            },
+            reaction_network: () => {
+                const graph = new Graph();
+                const molecules = [];
+                for (let i = 0; i < 3; i++) {
+                    const lId = graph.addNode(NodeType.L);
+                    const aId = graph.addNode(NodeType.A);
+                    molecules.push([lId, aId]);
+                    const lNode = graph.nodes[lId];
+                    const aNode = graph.nodes[aId];
+                    graph.connect(lNode.ports.right, aNode.ports.left);
+                    graph.connect(lNode.ports.left, aNode.ports.middle);
+                }
+                const mol0L = graph.nodes[molecules[0][0]];
+                const mol1A = graph.nodes[molecules[1][1]];
+                graph.connect(mol0L.ports.middle, mol1A.ports.right);
+                const mol1L = graph.nodes[molecules[1][0]];
+                const mol2A = graph.nodes[molecules[2][1]];
+                graph.connect(mol1L.ports.middle, mol2A.ports.right);
+                const mol2L = graph.nodes[molecules[2][0]];
+                const mol0A = graph.nodes[molecules[0][1]];
+                graph.connect(mol2L.ports.middle, mol0A.ports.right);
+                return graph;
+            },
+            ouroboros: () => {
+                const graph = new Graph();
+                const nodes = [];
+                for (let i = 0; i < 5; i++) {
+                    const nodeId = (i % 2 === 0) 
+                        ? graph.addNode(NodeType.L)
+                        : graph.addNode(NodeType.A);
+                    nodes.push(nodeId);
+                }
+                for (let i = 0; i < nodes.length - 1; i++) {
+                    const node1 = graph.nodes[nodes[i]];
+                    const node2 = graph.nodes[nodes[i + 1]];
+                    if (node1.nodeType === NodeType.L) {
+                        graph.connect(node1.ports.right, node2.ports.left);
+                    } else {
+                        graph.connect(node1.ports.middle, node2.ports.left);
+                    }
+                }
+                const lastNode = graph.nodes[nodes[nodes.length - 1]];
+                const firstNode = graph.nodes[nodes[0]];
+                if (lastNode.nodeType === NodeType.A) {
+                    graph.connect(lastNode.ports.middle, firstNode.ports.middle);
+                } else {
+                    graph.connect(lastNode.ports.right, firstNode.ports.middle);
+                }
+                return graph;
+            },
+            metabolism: () => {
+                const graph = new Graph();
+                const organismLId = graph.addNode(NodeType.L);
+                const organismL = graph.nodes[organismLId];
+                const organismAId = graph.addNode(NodeType.A);
+                const organismA = graph.nodes[organismAId];
+                graph.connect(organismL.ports.right, organismA.ports.left);
+                graph.connect(organismL.ports.left, organismA.ports.middle);
+                const foodNodes = [];
+                for (let i = 0; i < 3; i++) {
+                    const foodId = graph.addNode(NodeType.A);
+                    foodNodes.push(foodId);
+                    const foodNode = graph.nodes[foodId];
+                    graph.connect(foodNode.ports.middle, organismA.ports.right);
+                }
+                const foId = graph.addNode(NodeType.FO);
+                const fo = graph.nodes[foId];
+                graph.connect(fo.ports.middle, organismL.ports.middle);
+                graph.connect(fo.ports.left, graph.nodes[foodNodes[0]].ports.left);
+                graph.connect(fo.ports.right, graph.nodes[foodNodes[1]].ports.left);
+                return graph;
+            }
+        };
+        
+        function loadExample() {
+            const exampleName = document.getElementById('exampleSelect').value;
+            currentExample = exampleName;
+            initialGraph = exampleCreators[exampleName]();
+            simulator = new Simulator(initialGraph);
+            updateDisplay();
+        }
+        
+        function updateRewriteWeight(value) {
+            // This would control rewrite probabilities in a more advanced implementation
+            // For now, just store the value
+            console.log('Rewrite weight:', value);
+        }
+        
+        window.step = function() {
+            const applied = simulator.step(false);
+            if (applied) {
+                updateDisplay();
+            }
+        };
+        
+        window.run = function() {
+            simulator.run(20, false);
+            updateDisplay();
+        };
+        
+        window.reset = function() {
+            if (currentExample) {
+                initialGraph = exampleCreators[currentExample]();
+                simulator = new Simulator(initialGraph);
+                updateDisplay();
+            }
+        };
+        
+        // Initialize
+        loadExample();
+    </script>
+</body>
+</html>
+

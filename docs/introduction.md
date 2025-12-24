@@ -15,11 +15,11 @@ Marius Buliga's work on chemlambda and interaction combinators represents a sign
 
 ## Relationship to Lafont's Interaction Combinators
 
-Yves Lafont's **Interaction Combinators** (1997) provide a minimal universal system for graph rewriting with only three symbols (γ, δ, ε) and six interaction rules. Lafont proved that:
+Yves Lafont's **Interaction Combinators** (1997) provide a minimal system for graph rewriting with only three symbols (γ, δ, ε) and six interaction rules. Lafont showed that:
 
-- Any interaction system can be translated into interaction combinators
-- This establishes "Lafont universality" or "graph rewriting universality"
-- For confluent systems, this is equivalent to Turing universality
+- Many interaction systems can be encoded using interaction combinators
+- Lambda calculus can be encoded, demonstrating computational expressiveness
+- The system provides a foundation for understanding graph rewriting computation
 
 Buliga's contribution extends this work by:
 
@@ -101,7 +101,7 @@ Buliga's work is significant because it:
 1. **Bridges computation and chemistry**: Shows how computation can be performed through chemical reactions
 2. **Enables decentralized computing**: Local, asynchronous algorithms
 3. **Demonstrates artificial life**: Self-replication, metabolism, death
-4. **Provides universality**: Minimal systems that can simulate any computation
+4. **Demonstrates expressiveness**: Minimal systems that can encode many computations
 5. **Challenges semantics**: Shows computation can emerge from structure alone
 
 ## Next Steps

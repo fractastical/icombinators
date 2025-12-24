@@ -34,7 +34,7 @@ When a constructor (γ) interacts with a duplicator (δ):
 **Why important**:
 - Enables distribution of construction over duplication
 - Essential for encoding complex operations
-- Foundation for universality
+- Foundation for expressiveness
 
 ### 2. γ-ε Commutation
 
@@ -110,10 +110,10 @@ When a duplicator (δ) interacts with an eraser (ε):
 
 ## Why Commutation Is Important
 
-### Universality
+### Expressiveness
 
-- **Enables encoding**: Can encode any interaction system
-- **Foundation**: Part of the minimal universal system
+- **Enables encoding**: Can encode many interaction systems
+- **Foundation**: Part of a minimal expressive system
 - **Flexibility**: Handles different symbol combinations
 
 ### Distribution

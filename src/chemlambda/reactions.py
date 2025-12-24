@@ -373,10 +373,16 @@ class PruningReaction(Reaction):
         return False
 
 
+# Import additional reactions
+from .dist_reactions import DistReaction
+from .fan_in_reaction import FanInReaction
+
 # Export all reactions
 ALL_REACTIONS = [
     BetaReaction(),
-    CombReaction(),
+    FanInReaction(),
+    DistReaction(),
     PruningReaction(),
+    CombReaction(),  # COMB should be last (lowest priority)
 ]
 

@@ -178,10 +178,10 @@ chemSKI achieves this through **synthesis rewrites**:
 - Enables cost estimation
 - Resource management
 
-### Universality
+### Expressiveness
 
-- SKI combinators are Turing complete
-- Can encode any computation
+- SKI combinators demonstrate significant computational expressiveness
+- Can encode many computations
 - Alternative to lambda calculus
 
 ## Implementation

@@ -118,16 +118,16 @@ Graphs exhibit **metabolism**:
 
 ## Graph Rewriting Universality
 
-### Lafont Universality
+### Lafont Expressiveness
 
-Interaction combinators establish **graph rewriting universality**:
-- Any interaction system can be encoded
-- Not just Turing machines
-- Establishes graph rewriting as fundamental model
+Interaction combinators demonstrate significant expressiveness:
+- Many interaction systems can be encoded
+- Lambda calculus and related systems can be represented
+- Shows graph rewriting as an important computational model
 
 ### Significance
 
-- **Minimal systems**: Very simple rules, universal power
+- **Minimal systems**: Very simple rules, significant expressiveness
 - **Structural computation**: Computation at structural level
 - **No semantics needed**: Structure alone enables computation
 - **Foundation**: Basis for understanding computation
@@ -253,7 +253,7 @@ Buliga's work is significant because it:
 
 1. **Bridges domains**: Computation, chemistry, biology, mathematics
 2. **Enables new applications**: Molecular computing, artificial life
-3. **Provides foundations**: Graph rewriting universality
+3. **Provides foundations**: Graph rewriting expressiveness
 4. **Challenges assumptions**: Semantics not needed for computation
 5. **Opens possibilities**: Self-replication, evolution, life
 

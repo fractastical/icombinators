@@ -36,7 +36,7 @@ When two constructors (γ) interact:
 **Why important**:
 - Enables swapping of structures
 - Essential for encoding operations
-- Foundation for universality
+- Foundation for expressiveness
 
 ### 2. δ-δ Annihilation
 
@@ -111,10 +111,10 @@ When two erasers (ε) interact:
 
 ## Why Annihilation Is Important
 
-### Universality
+### Expressiveness
 
-- **Enables encoding**: Can encode any interaction system
-- **Foundation**: Part of the minimal universal system
+- **Enables encoding**: Can encode many interaction systems
+- **Foundation**: Part of a minimal expressive system
 - **Flexibility**: Handles same-symbol interactions
 
 ### Duplication and Exchange

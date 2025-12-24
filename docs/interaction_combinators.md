@@ -1,6 +1,6 @@
 # Interaction Combinators (Lafont's System)
 
-Yves Lafont's Interaction Combinators provide a minimal universal system for graph rewriting computation. With only three symbols and six rules, they can simulate any interaction system, establishing "Lafont universality" or "graph rewriting universality."
+Yves Lafont's Interaction Combinators provide a minimal system for graph rewriting computation. With only three symbols and six rules, they can encode many interaction systems, demonstrating significant expressiveness for graph rewriting.
 
 ## Basic Components
 
@@ -40,14 +40,15 @@ When two **same** symbols interact, they eliminate each other:
 
 ## Key Properties
 
-### Universality
+### Expressiveness
 
-**Lafont's Theorem**: Any interaction system can be translated into interaction combinators.
+**Lafont's Result**: Interaction combinators demonstrate significant expressiveness for encoding interaction systems.
 
 This means:
-- Any computation expressible as an interaction system can be done with interaction combinators
-- Since Turing machines can be expressed as interaction systems, interaction combinators are Turing universal
-- More importantly, this establishes universality at the **graph rewriting level**, not just computation level
+- Many interaction systems can be encoded using interaction combinators
+- Lambda calculus can be encoded, establishing computational expressiveness
+- The encoding preserves reduction behavior for confluent systems
+- This demonstrates significant expressiveness at the graph rewriting level
 
 ### Strong Confluence
 
@@ -102,24 +103,24 @@ Interaction combinators can encode lambda calculus:
 
 However, interaction combinators are more general:
 - Not limited to lambda calculus
-- Can encode any interaction system
+- Can encode many interaction systems
 - Focus on structure, not semantics
 
 ## Significance
 
-### Minimal Universal System
+### Minimal Expressive System
 
 With only **3 symbols** and **6 rules**, interaction combinators are:
-- The simplest known universal graph rewriting system
+- A simple and expressive graph rewriting system
 - A foundation for understanding computation at the structural level
-- Proof that computation can emerge from very simple local rules
+- Demonstration that computation can emerge from simple local rules
 
-### Graph Rewriting Universality
+### Graph Rewriting Expressiveness
 
-Lafont universality means:
-- Any graph rewriting system can be encoded
-- Not just Turing machines, but any interaction system
-- Establishes graph rewriting as a fundamental computational model
+Lafont's result demonstrates:
+- Significant expressiveness for encoding interaction systems
+- Ability to encode lambda calculus and related systems
+- Shows that graph rewriting can capture important computational patterns
 
 ### Foundation for Molecular Computing
 
