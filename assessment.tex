@@ -88,36 +88,53 @@ Chemlambda is a graph rewriting system based on lambda calculus that enables pur
 Chemlambda reactions are organized into five families:
 
 \subsubsection{BETA Move}
-The core computational mechanism implementing lambda calculus beta reduction:
+The core computational mechanism implementing lambda calculus beta reduction.
+
+Notation: For node $N$ with ports $p_1, p_2, p_3$, we write $N\ p_1\ p_2\ p_3$ where the port order follows the node type's standard ordering (L: middle.in, left.out, right.out; A: left.in, right.in, middle.out).
+
 \[
-L\ 1\ 2\ c,\ A\ c\ 4\ 3 \rightarrow \text{Arrow}\ 1\ 3,\ \text{Arrow}\ 4\ 2
+L(1, 2, c),\ A(c, 4, 3) \rightarrow \text{Arrow}(1, 3),\ \text{Arrow}(4, 2)
 \]
+
+Where $L(1,2,c)$ denotes a Lambda node with ports $1=\text{middle.in}$, $2=\text{left.out}$, $c=\text{right.out}$, and $A(c,4,3)$ denotes an Application node with ports $c=\text{left.in}$, $4=\text{right.in}$, $3=\text{middle.out}$. The result connects port $1$ to port $3$ and port $4$ to port $2$ via Arrow nodes.
 
 \subsubsection{FAN-IN Move}
-Handles fan-in and fan-out operations:
+Handles fan-in and fan-out operations.
+
 \[
-FI\ 1\ 4\ c,\ FOE\ c\ 2\ 3 \rightarrow \text{Arrow}\ 1\ 3,\ \text{Arrow}\ 4\ 2
+FI(1, 4, c),\ FOE(c, 2, 3) \rightarrow \text{Arrow}(1, 3),\ \text{Arrow}(4, 2)
 \]
+
+Where $FI(1,4,c)$ denotes a Fan-In node with ports $1=\text{left.in}$, $4=\text{right.in}$, $c=\text{middle.out}$, and $FOE(c,2,3)$ denotes a Fan-Out-Extra node with ports $c=\text{middle.in}$, $2=\text{left.out}$, $3=\text{right.out}$.
 
 \subsubsection{DIST Moves}
-Enable parallel reduction through distribution:
+Enable parallel reduction through distribution. These moves distribute operations over fan-out nodes, where $i, j, k, l$ are fresh port variables introduced by the rewrite.
+
 \begin{align*}
-FO\ 1\ 2\ c,\ FOE\ c\ 3\ 4 &\rightarrow FI\ j\ i\ 2,\ FO\ k\ i\ 3,\ FO\ l\ j\ 4,\ FOE\ 1\ k\ l\\
-FI\ 1\ 4\ c,\ FO\ c\ 2\ 3 &\rightarrow FO\ 1\ i\ j,\ FI\ i\ k\ 2,\ FI\ j\ l\ 3,\ FO\ 4\ k\ l\\
-L\ 1\ 2\ c,\ FO\ c\ 3\ 4 &\rightarrow FI\ j\ i\ 2,\ L\ k\ i\ 3,\ L\ l\ j\ 4,\ FOE\ 1\ k\ l
+FO(1, 2, c),\ FOE(c, 3, 4) &\rightarrow FI(j, i, 2),\ FO(k, i, 3),\ FO(l, j, 4),\ FOE(1, k, l)\\
+FI(1, 4, c),\ FO(c, 2, 3) &\rightarrow FO(1, i, j),\ FI(i, k, 2),\ FI(j, l, 3),\ FO(4, k, l)\\
+L(1, 2, c),\ FO(c, 3, 4) &\rightarrow FI(j, i, 2),\ L(k, i, 3),\ L(l, j, 4),\ FOE(1, k, l)
 \end{align*}
 
+Port ordering conventions: $FO/FOE$: (middle.in, left.out, right.out); $FI$: (left.in, right.in, middle.out); $L$: (middle.in, left.out, right.out).
+
 \subsubsection{PRUNING Moves}
-Garbage collection and termination:
+Garbage collection and termination. When an application's output is terminated, both inputs are also terminated.
+
 \[
-A\ 1\ 2\ 3,\ T\ 3 \rightarrow T\ 1,\ T\ 2
+A(1, 2, 3),\ T(3) \rightarrow T(1),\ T(2)
 \]
 
+Where $A(1,2,3)$ has ports $1=\text{left.in}$, $2=\text{right.in}$, $3=\text{middle.out}$, and $T(3)$ is a Termination node connected to port $3$. The result creates two Termination nodes connected to ports $1$ and $2$ respectively.
+
 \subsubsection{COMB Move}
-Arrow elimination:
+Arrow elimination. Eliminates Arrow nodes by connecting their endpoints directly.
+
 \[
-M\ 1,\ \text{Arrow}\ 1\ 2 \rightarrow M\ 2
+M(1),\ \text{Arrow}(1, 2) \rightarrow M(2)
 \]
+
+Where $M$ is any node with port $1$ connected to an Arrow node's input, and the Arrow's output (port $2$) connects to the rest of the graph. The Arrow is eliminated and $M$'s port $1$ is directly connected to port $2$.
 
 \subsection{Theoretical Contributions}
 
